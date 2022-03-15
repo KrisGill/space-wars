@@ -44,11 +44,11 @@ public class Missile   {
             isActive = true;
 
             if ((direction == RIGHT)||(direction==LEFT))
-            {  width = screenX/20;
-                height = 1;}
+            {  width = screenX/10;
+                height = 5;}
 
-            else{height = screenY/20;
-                width = 1;}
+            else{height = screenY/10;
+                width = 10;}
 
             return true;
         }
@@ -92,13 +92,13 @@ public class Missile   {
         isActive = false;
     }
 
+    public void setActive(){isActive=true;}
+
     public float getImpactPointY() {
         if (heading == DOWN) {
             return y + height;
         }
-
         return y;
-
     }
 
     public float getImpactPointX() {

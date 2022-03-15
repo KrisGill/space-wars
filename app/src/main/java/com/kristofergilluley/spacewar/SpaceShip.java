@@ -8,7 +8,7 @@ import android.graphics.RectF;
 
  abstract class Spaceship {
 
-    RectF rect;
+   protected RectF rect;
     protected Bitmap bitmapup;
     protected Bitmap bitmapleft;
     protected Bitmap bitmapright;
@@ -28,15 +28,16 @@ import android.graphics.RectF;
      protected final int DOWN = 4;
 
     protected int lives;
+    protected boolean visibility;
 
     ///maybe more movement than this
-    protected int SpaceShipMoving = STOPPED;
+    protected int spaceShipMoving = STOPPED;
      protected int spaceShipSpeed;
 
 
     public Spaceship(Context context, int screenX, int screenY){
 
-        rect = new RectF();
+      //  rect = new RectF();
 
         length = screenX/10;
         height = screenY/10;
@@ -71,23 +72,23 @@ import android.graphics.RectF;
     }
 
     public void setMovementState(int state){
-        SpaceShipMoving = state;
+        spaceShipMoving = state;
     }
 
     public void update(long fps){
-        if(SpaceShipMoving == LEFT){
+        if(spaceShipMoving == LEFT){
             x = x - spaceShipSpeed / fps;
             currentBitmap = bitmapleft;
             if ((x+length)<=0)
                 x = screenX;
         }
-        if(SpaceShipMoving == RIGHT){
+        if(spaceShipMoving == RIGHT){
             x = x + spaceShipSpeed / fps;
             currentBitmap = bitmapright;
             if (x>=screenX)
                 x = 0 - length;
         }
-        if(SpaceShipMoving == UP){
+        if(spaceShipMoving == UP){
             y = y - spaceShipSpeed / fps;
             currentBitmap = bitmapup;
             if (y+height <=0)
@@ -95,7 +96,7 @@ import android.graphics.RectF;
 
         }
 
-        if(SpaceShipMoving == DOWN){
+        if(spaceShipMoving == DOWN){
             y = y + spaceShipSpeed / fps;
             currentBitmap = bitmapdown;
             if (y>=screenY)
@@ -136,5 +137,13 @@ import android.graphics.RectF;
     public float getHeight(){
         return height;
     }
+    public void setVisibility(boolean bool)
+    {
+        visibility=bool;
+    }
+        public boolean getVisible()
+        {
+            return visibility;
+        }
 
-}
+ }

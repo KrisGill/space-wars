@@ -10,7 +10,7 @@ public class BigBadBoss extends Spaceship{
         super(context, screenX, screenY);
         rect = new RectF();
 
-        length = screenX/2;
+        length = screenX/4;
         height = screenY/4;
 
         x = screenX/5;

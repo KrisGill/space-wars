@@ -18,6 +18,7 @@ import android.view.SurfaceView;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import java.io.IOException;
+import java.util.Random;
 
 public class SpaceGameView extends SurfaceView implements Runnable{
 
@@ -58,11 +59,14 @@ public class SpaceGameView extends SurfaceView implements Runnable{
 
 
     private HeroShip spaceShip;
-    private Missile bullet;
+    private Missile bullet, badBullet;
     private Bitmap bitmapback;
-    private SpaceBug [][] bug = new SpaceBug[6][4];
+    private SpaceBug [][] bug = new SpaceBug[15][3];
     private ShooterShip shooterShip,shooterShip2;
     private BigBadBoss boss;
+    private Boolean bumped;
+    private Random random = new Random();
+    private int shooterShipLaunch=0,shooterShipShoot=0;
 
 
     // This special constructor method runs
@@ -83,8 +87,6 @@ public class SpaceGameView extends SurfaceView implements Runnable{
         screenX = x;
         screenY = y;
 
-
-
         initLevel();
     }
 
@@ -92,15 +94,17 @@ public class SpaceGameView extends SurfaceView implements Runnable{
 
         spaceShip = new HeroShip(context, screenX, screenY);
         bullet = new Missile(context,screenX,screenY);
+        badBullet=new Missile(context,screenX,screenY);
         for(int i=0; i<bug.length;i++)
             for(int j=0;j<bug[1].length;j++)
         {
-            bug[i][j]= new SpaceBug(context,screenX,screenY,i,j+2);
+            bug[i][j]= new SpaceBug(context,screenX,screenY,i,j);
+            bug[i][j].setMovementState(2);
         }
         shooterShip = new ShooterShip(context, screenX, screenY,2,0,6);
         shooterShip2 = new ShooterShip(context,screenX,screenY,0,2,6);
         boss=new BigBadBoss(context,screenX,screenY);
-
+        bumped=false;
     }
 
     @Override
@@ -125,14 +129,52 @@ public class SpaceGameView extends SurfaceView implements Runnable{
             if (timeThisFrame >= 1) {
                 fps = 1000 / timeThisFrame;
             }
-
         }
-
     }
 
     private void update()
     {
         spaceShip.update(fps);
+        for(int i=0; i<bug.length;i++)
+            for(int j=0;j<bug[1].length;j++)
+            {
+                bug[i][j].update(fps);
+                if(bug[i][j].changeDirection())
+                    bumped=true;
+            }
+        if(bumped)
+        {
+            for(int x=0;x< bug.length;x++)
+                for(int y=0;y<bug[1].length;y++)
+                    bug[x][y].dropDownAndReverse();
+                bumped=false;
+        }
+        shooterShipLaunch=random.nextInt(100);
+        shooterShipShoot=random.nextInt(10);
+        Log.e("Random",String.valueOf(shooterShipLaunch));
+        if(shooterShipLaunch==50  && !shooterShip.getVisible())
+            shooterShip.setVisibility(true);
+       if(shooterShip.getVisible()) {
+            shooterShip.update(fps);
+            if(shooterShipShoot==5) {
+              //  badBullet.shoot(shooterShip.getX(), shooterShip.getY(), 1);
+               // badBullet.update(fps);
+               // shooterShip.shoot();
+            }
+        }
+        if(shooterShip.getVisible() && shooterShipShoot==5) {
+            badBullet.shoot(shooterShip.getX() + (shooterShip.getLength()/2), shooterShip.getY(), 1);
+            badBullet.update(fps);
+        }
+
+        if(shooterShip.getX()>screenX) {//resets shootership location
+            shooterShip.setVisibility(false);
+            shooterShip.setX(0);
+            shooterShip.setY(screenY/8);
+        }
+        if(badBullet.getStatus())
+            badBullet.update(fps);
+
         if(bullet.getStatus())
             bullet.update(fps);
         checkCollisions();
@@ -158,6 +200,9 @@ public class SpaceGameView extends SurfaceView implements Runnable{
             bullet.setInactive();
         if(bullet.getImpactPointX() > screenX)
             bullet.setInactive();
+
+        if(badBullet.getImpactPointY()>screenY)
+            badBullet.setInactive();
     }
 
     private void draw(){
@@ -178,18 +223,22 @@ public class SpaceGameView extends SurfaceView implements Runnable{
             //  draw the defender
             canvas.drawBitmap(bitmapback, 0, 0, paint);
             canvas.drawBitmap(spaceShip.getBitmap(), spaceShip.getX(), spaceShip.getY() , paint);
-//            canvas.drawBitmap(bullet.getBitmap(),bullet.getX(),bullet.getY(),paint);
-//         if(bullet.getStatus())
-       //         canvas.drawRect(bullet.getRect(), paint);
+//           canvas.drawBitmap(bullet.getBitmap(),bullet.getX(),bullet.getY(),paint);
+            if(bullet.getStatus())
+                canvas.drawRect(bullet.getRect(), paint);
+            if(badBullet.getStatus())
+                canvas.drawRect(badBullet.getRect(),paint);
 
-            for(int sp =0;sp<bug.length;sp++)
-                for(int ss=0;ss<bug[1].length;ss++)
+            for(int i =0;i<bug.length;i++)
+                for(int j=0;j<bug[1].length;j++)
             {
-                canvas.drawBitmap(bug[sp][ss].getBitmap(),bug[sp][ss].getX(),bug[sp][ss].getY(),paint);
+                if(bug[i][j].getVisibility())
+                canvas.drawBitmap(bug[i][j].getBitmap(),bug[i][j].getX(),bug[i][j].getY(),paint);
             }
+            if(shooterShip.getVisible())
             canvas.drawBitmap(shooterShip.getBitmap(),shooterShip.getX(),shooterShip.getY(),paint);
-            canvas.drawBitmap(shooterShip2.getBitmap(),shooterShip2.getX(),shooterShip2.getY(),paint);
-            canvas.drawBitmap(boss.getBitmap(),boss.getX(),boss.getY(),paint);
+
+         //   canvas.drawBitmap(boss.getBitmap(),boss.getX(),boss.getY(),paint);
             // Draw the score and remaining lives
             // Change the brush color
             paint.setColor(Color.argb(255,  20, 255, 0));
@@ -198,8 +247,8 @@ public class SpaceGameView extends SurfaceView implements Runnable{
             paint.setTextSize(screenX/8);
             paint.setColor(Color.argb(255,255,50,43));
            // paint.setTypeface(Typeface.create("Biome", Typeface.BOLD));
-            paint.setTypeface(Typeface.create("biorhyme_bold",Typeface.BOLD));//font not working but bold is
-            canvas.drawText("SPACE WAR",screenX/5,(screenY/4)+50,paint);
+           // paint.setTypeface(Typeface.create("biorhyme_bold",Typeface.BOLD));//font not working but bold is
+            //canvas.drawText("SPACE WAR",screenX/5,(screenY/4)+50,paint);
 
             // Draw everything to the screen
             ourHolder.unlockCanvasAndPost(canvas);
@@ -235,50 +284,38 @@ public class SpaceGameView extends SurfaceView implements Runnable{
             // Player has touched the screen
 
             case MotionEvent.ACTION_DOWN:
-                Log.e("Touch","The screen has been touched 4");
+               // Log.e("Touch", "The screen has been touched 4");
                 paused = false;
 
                 if(motionEvent.getY() > screenY - screenY / 2) {
                     if (motionEvent.getX() > screenX / 2) {
                         spaceShip.setMovementState(spaceShip.RIGHT);
                         bullet.shoot(spaceShip.getX()+ spaceShip.getLength(),spaceShip.getY()+ spaceShip.getHeight()/2,2);
-                        Log.e("Touch","The screen has been touched 4");
+                        Log.e("Touch","The screen has been touched 1");
                     } else {
                         spaceShip.setMovementState(spaceShip.LEFT);
                         bullet.shoot(spaceShip.getX(),spaceShip.getY()+ spaceShip.getHeight()/2,3);
-                        Log.e("Touch","The screen has been touched 4");
+                       // badBullet.shoot(screenX/2,0,1); //testing bad bullet
+                        Log.e("Touch","The screen has been touched 2");
                     }
                 }
-
                 if(motionEvent.getY() < screenY - screenY / 2) {
                     if (motionEvent.getX() > screenX / 2) {
                         spaceShip.setMovementState(spaceShip.UP);
                         bullet.shoot(spaceShip.getX()+ spaceShip.getLength()/2,spaceShip.getY(),0);
-                        Log.e("Touch","The screen has been touched 4");
+                        Log.e("Touch","The screen has been touched 3");
                     } else {
                         spaceShip.setMovementState(spaceShip.DOWN);
                         bullet.shoot(spaceShip.getX()+ spaceShip.getLength()/2,spaceShip.getY()+ spaceShip.getHeight(),1);
                         Log.e("Touch","The screen has been touched 4");
                     }
                     Log.e("Touch","The screen has been touched 4");
-                }
-
-                //    if(motionEvent.getY() < screenY - screenY / 8) {
-                // Shots fired
-                //       if(bullet.shoot(playerShip.getX()+ playerShip.getLength()/2,screenY)){
-                //        soundPool.play(shootID, 1, 1, 0, 0, 1);
-                //       }
-                //   }
-
-                break;
-
+        }
+        break;
             // Player has removed finger from screen
             case MotionEvent.ACTION_UP:
-
-                //   if(motionEvent.getY() > screenY - screenY / 10) {
                 spaceShip.setMovementState(spaceShip.STOPPED);
                 Log.e("Touch","The screen has been touched 4");
-                //   }
                 break;
         }
         return true;
