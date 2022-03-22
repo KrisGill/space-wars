@@ -6,7 +6,8 @@ import android.graphics.BitmapFactory;
 import android.graphics.RectF;
 
 public class SpaceBug extends Spaceship {
-    boolean isVisible,bumped;
+    boolean isVisible,bumped,isActive;
+    float locX, locY;
     int id;
 
     public SpaceBug(Context context, int screenX, int screenY, int lives, int locationX, int locationY) {
@@ -16,6 +17,7 @@ public class SpaceBug extends Spaceship {
         rect = new RectF();
 
         isVisible = true;
+        isActive=true;
 
         length = screenX / 50;
         height = screenY / 50;
@@ -43,6 +45,7 @@ public class SpaceBug extends Spaceship {
         rect = new RectF();
 
         isVisible = true;
+        isActive=true;
         bumped=false;
 
         length = screenX / 20;
@@ -52,6 +55,9 @@ public class SpaceBug extends Spaceship {
         //y = screenY /10 + (height*locY);
         x = length * locX;
         y = height * locY;
+
+        this.locX=x;
+        this.locY=y;
 
         spaceShipSpeed = 150;
         bitmapup = BitmapFactory.decodeResource(context.getResources(), R.drawable.spacemonster);
@@ -69,6 +75,11 @@ public class SpaceBug extends Spaceship {
         this.screenX = screenX;
         this.screenY = screenY;
 
+    }
+    public void resetShips()
+    {
+        x=locX;
+        y=locY;
     }
 
     public void update(long fps) {
@@ -90,11 +101,13 @@ public class SpaceBug extends Spaceship {
         rect.right = x + length;
     }
 
-    public void dropDownAndReverse() {
+    public void moveDownChangeDirection() {
         if (spaceShipMoving == LEFT)
             spaceShipMoving = RIGHT;
         else
             spaceShipMoving = LEFT;
+
+       // spaceShipSpeed *= 1.1;//moves the aliens a little faster after each drop down
         y = y + (height/2);
     }
 
@@ -106,13 +119,12 @@ public class SpaceBug extends Spaceship {
             return false;
     }
 
-        public boolean getVisibility ()
-        {
-            return isVisible;
-        }
+    public void setInactive(){
+        isActive = false;
+    }
+    public boolean getStatus(){
+        return isActive;
+    }
+    public void setActive(){isActive=true;}
 
-        public void setVisible ( boolean bool)
-        {
-            isVisible = bool;
-        }
     }

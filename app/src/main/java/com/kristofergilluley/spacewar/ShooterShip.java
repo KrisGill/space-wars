@@ -25,7 +25,7 @@ public class ShooterShip extends Spaceship
         x=0-length;
         y=screenY/8;
 
-        spaceShipSpeed = 200;
+        spaceShipSpeed = 150;
         visibility=false;
         bitmapup = BitmapFactory.decodeResource(context.getResources(), R.drawable.alienspaceship);
 
@@ -44,17 +44,23 @@ public class ShooterShip extends Spaceship
         if(lives==2) {
             currentBitmap = bitmapup;
         }
-        if(lives<2) {
+        if(lives==1) {
             currentBitmap = bitmapdown;
         }
+        if(lives==0)
+            visibility=false;
         this.screenX = screenX;
         this.screenY = screenY;
     }
 
-    public String getLives()
+    public int getLives()
     {
-        String str = String.valueOf(lives);
-        return str;
+        return lives;
+    }
+
+    public void setLives(int num)
+    {
+        lives=num;
     }
 
     public void update(long fps)
@@ -63,10 +69,25 @@ public class ShooterShip extends Spaceship
             currentBitmap = getBitmap();
             if ((x + length) <= 0)
                 x = screenX;
+
+        rect.top = y;
+        rect.bottom = y + height;
+        rect.left = x;
+        rect.right = x + length;
     }
 
     public void shoot()
     {
         Log.e("Random","bang");
     }
+
+    public Bitmap getBitmap()
+    {
+        if(lives>1)
+            return bitmapup;
+        else
+            return bitmapdown;
+    }
+
+
 }

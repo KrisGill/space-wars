@@ -14,6 +14,8 @@ public class HeroShip extends Spaceship
 
         length = screenX/10;
         height = screenY/10;
+        visibility=true;
+        lives=3;
 
         x = screenX / 2;
         y = screenY / 2;
@@ -28,13 +30,13 @@ public class HeroShip extends Spaceship
                 false);
 
         bitmapup = BitmapFactory.decodeResource(context.getResources(), R.drawable.spaceshipup);
-        bitmapup = Bitmap.createScaledBitmap(bitmapup, (int) (length), (int) (height),false);
+        bitmapup = Bitmap.createScaledBitmap(bitmapup, (int) (length/2), (int) (height),false);
 
         bitmapright = BitmapFactory.decodeResource(context.getResources(), R.drawable.spaceshipright);
         bitmapright = Bitmap.createScaledBitmap(bitmapright, (int) (length), (int) (height),false);
 
         bitmapleft = BitmapFactory.decodeResource(context.getResources(), R.drawable.spaceshipleft);
-        bitmapleft = Bitmap.createScaledBitmap(bitmapleft, (int) (length*2), (int) (height),false);
+        bitmapleft = Bitmap.createScaledBitmap(bitmapleft, (int) (length), (int) (height),false);
 
         bitmapdown = BitmapFactory.decodeResource(context.getResources(), R.drawable.spaceshipdown);
         bitmapdown = Bitmap.createScaledBitmap(bitmapdown, (int) (length), (int) (height),false);
@@ -42,5 +44,14 @@ public class HeroShip extends Spaceship
         currentBitmap = bitmapleft;
         this.screenX = screenX;
         this.screenY = screenY;
+    }
+
+    public int getLives()
+    {
+        return lives;
+    }
+    public void setLives(int num)
+    {
+        lives=num;
     }
 }

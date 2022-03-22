@@ -1,9 +1,8 @@
-package com.kristofergilluley.spacewar;
+package com.example.spaceinvaders;
 
-import android.content.Context;
 import android.graphics.RectF;
 
-public class Missile   {
+public class Bullet {
 
     private float x;
     private float y;
@@ -25,8 +24,7 @@ public class Missile   {
 
     private boolean isActive;
 
-    public Missile(Context context,int screenX, int screenY) {
-       // super(context,screenX,screenY);
+    public Bullet(int screenY, int screenX) {
 
         //  height = screenY / 20;
         isActive = false;
@@ -44,14 +42,15 @@ public class Missile   {
             isActive = true;
 
             if ((direction == RIGHT)||(direction==LEFT))
-            {  width = screenX/50;
-                height = screenY/100;}
+            {  width = screenX/20;
+                height = 1;}
 
-            else{height = screenY/25;
-                width = screenX/200;}
+            else{height = screenY/20;
+                width = 1;}
 
             return true;
         }
+
         // Bullet already active
         return false;
     }
@@ -70,12 +69,15 @@ public class Missile   {
 
         else
         { x = x - speed / fps;}
+
         // Update rect
         rect.left = x;
         rect.right = x + width;
         rect.top = y;
         rect.bottom = y + height;
     }
+
+
     public RectF getRect(){
         return  rect;
     }
@@ -88,8 +90,6 @@ public class Missile   {
         isActive = false;
     }
 
-    public void setActive(){isActive=true;}
-
     public float getImpactPointY() {
         if (heading == DOWN) {
             return y + height;
@@ -101,9 +101,9 @@ public class Missile   {
         if (heading == RIGHT){
             return  x + width; }
         return x;}
+    //
 
-    public void setSpeed(int num)
-    {
-        speed=num;
-    }
+
+
 }
+
